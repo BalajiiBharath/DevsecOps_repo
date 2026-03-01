@@ -1,111 +1,95 @@
 name: Terraform DevSecOps Pipeline
-on:
 
- pull_request:
-  branches:
-   - main
- push:
-  branches:
-   - main
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
 
 permissions:
- id-token: write
- contents: read
+  id-token: write
+  contents: read
 
 
 jobs:
 
- security:
+  security:
 
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
+    steps:
 
-  steps:
-
-
-   - name: Checkout
-
-     uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
 
-   - name: Setup Terraform
-
-     uses: hashicorp/setup-terraform@v3
-
-
-   - name: Terraform Init
-
-     run: terraform init
-
-     working-directory: terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
 
-   - name: Terraform Validate
-
-     run: terraform validate
-
-     working-directory: terraform
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
 
 
-   - name: Checkov Scan
-
-     uses: bridgecrewio/checkov-action@master
-     continue-on-error: true
-
-     with:
-
-      directory: terraform
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform
 
 
-   # - name: Gitleaks Scan
-
-   #   uses: gitleaks/gitleaks-action@v2
-   #   with:
-   #     args: detect --source=. --report-format=sarif --report-path=gitleaks.sarif
-
-
- deploy:
+      - name: Checkov Scan
+        uses: bridgecrewio/checkov-action@v12
+        continue-on-error: true
+        with:
+          directory: terraform
 
 
-  needs: security
-  runs-on: ubuntu-latest
-
-  if: github.ref == 'refs/heads/main'
-
-  steps:
+      # - name: Gitleaks Scan
+      #   uses: gitleaks/gitleaks-action@v2
+      #   with:
+      #     args: detect --source=. --report-format=sarif --report-path=gitleaks.sarif
 
 
-   - name: Checkout
 
-     uses: actions/checkout@v4
+  deploy:
 
+    needs: security
 
-   - name: Setup Terraform
+    runs-on: ubuntu-latest
 
-     uses: hashicorp/setup-terraform@v3
+    if: github.ref == 'refs/heads/main'
 
+    steps:
 
-   - name: Vault Authentication & Get AWS Creds
-     uses: hashicorp/vault-action@v2
-     with:
-      url: http://13.61.182.181:8200
-     method: jwt
-     role: github-role
-     exportEnv: true
-    secrets: |
-      aws/creds/github-role access_key | AWS_ACCESS_KEY_ID ;
-      aws/creds/github-role secret_key | AWS_SECRET_ACCESS_KEY ;
+      - name: Checkout
+        uses: actions/checkout@v4
 
 
-   - name: Terraform Init
-
-     run: terraform init
-
-     working-directory: terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
 
-   - name: Terraform Apply
+      - name: Vault Authentication & Get AWS Creds
+        uses: hashicorp/vault-action@v2
+        with:
+          url: http://13.61.182.181:8200
+          method: jwt
+          role: github-role
+          exportEnv: true
+          secrets: |
+            aws/creds/github-role access_key | AWS_ACCESS_KEY_ID ;
+            aws/creds/github-role secret_key | AWS_SECRET_ACCESS_KEY ;
 
-     run: terraform apply -auto-approve
 
-     working-directory: terraform
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: terraform
