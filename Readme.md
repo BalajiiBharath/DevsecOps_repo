@@ -14,5 +14,4 @@ Gitleaks
 
 GitHub Actions
 
-
 Secure AWS deployment
