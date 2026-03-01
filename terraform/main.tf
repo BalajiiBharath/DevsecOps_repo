@@ -6,6 +6,6 @@ provider "aws" {
 
 resource "aws_s3_bucket" "demo_bucket" {
 
-  bucket = "my-simple-demo-bucket-123456"
+  bucket = "my-simple-demo-bucket-balaji-2026-01"
 
 }
