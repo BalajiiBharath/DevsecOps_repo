@@ -91,6 +91,7 @@ jobs:
       url: http://13.61.182.181:8200
      method: jwt
      role: github-role
+     exportEnv: true
     secrets: |
       aws/creds/github-role access_key | AWS_ACCESS_KEY_ID ;
       aws/creds/github-role secret_key | AWS_SECRET_ACCESS_KEY ;
