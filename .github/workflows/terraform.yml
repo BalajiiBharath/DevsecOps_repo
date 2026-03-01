@@ -15,7 +15,6 @@ permissions:
 
 jobs:
 
-
  security:
 
   runs-on: ubuntu-latest
@@ -86,17 +85,15 @@ jobs:
      uses: hashicorp/setup-terraform@v3
 
 
-   - name: Vault Authentication
-
+   - name: Vault Authentication & Get AWS Creds
      uses: hashicorp/vault-action@v2
-
      with:
-
       url: http://13.61.182.181:8200
-
-      method: jwt
-
-      role: github-role
+     method: jwt
+     role: github-role
+    secrets: |
+      aws/creds/github-role access_key | AWS_ACCESS_KEY_ID ;
+      aws/creds/github-role secret_key | AWS_SECRET_ACCESS_KEY ;
 
 
    - name: Terraform Init
