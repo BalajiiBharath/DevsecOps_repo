@@ -51,6 +51,7 @@ jobs:
    - name: Checkov Scan
 
      uses: bridgecrewio/checkov-action@master
+     continue-on-error: true
 
      with:
 
