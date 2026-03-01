@@ -1,9 +1,11 @@
-module "s3" {
+provider "aws" {
 
- source = "../modules/s3"
+  region = "eu-north-1"
 
- bucket_name = "devsecops-prod-bucket-123456"
+}
 
- environment = var.environment
+resource "aws_s3_bucket" "demo_bucket" {
+
+  bucket = "my-simple-demo-bucket-123456"
 
 }
